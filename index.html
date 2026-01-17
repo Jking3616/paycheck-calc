@@ -79,6 +79,12 @@
         .instruction-box { background: rgba(77, 173, 255, 0.1); border-left: 4px solid var(--accent); padding: 15px; margin-bottom: 20px; border-radius: 4px; }
         .inst-text { font-size: 13px; color: #fff; line-height: 1.4; margin: 0 0 8px 0; }
         .inst-step { display: block; margin-bottom: 5px; font-weight: bold; color: var(--accent); }
+        
+        /* Collapsible Styling */
+        .collapsible-header { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 0; user-select: none; }
+        .collapsible-content { display: none; margin-top: 5px; }
+        .collapsible-content.show { display: grid; }
+        .arrow { font-size: 0.8em; color: var(--accent); transition: transform 0.2s; }
     </style>
 </head>
 <body>
@@ -118,9 +124,12 @@
                 <option value="1">Level 1</option>
             </select>
             
-            <div style="margin: 15px 0; border-top: 1px solid var(--border); padding-top:10px;">
-                <span class="pref-title" style="color:var(--dim); font-size:0.65em;">PAY RATE DEFINITIONS (EDITABLE)</span>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:5px;">
+            <div style="margin: 15px 0; border-top: 1px solid var(--border); padding-top:0px;">
+                <div class="collapsible-header" onclick="toggleRates()">
+                    <span id="rate-arrow" class="arrow">▶</span>
+                    <span class="pref-title" style="color:var(--dim); font-size:0.65em;">PAY RATE DEFINITIONS (EDITABLE)</span>
+                </div>
+                <div id="rate-content" class="collapsible-content" style="grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><span class="input-label">L5 Rate ($)</span><input type="number" id="rateL5" value="38.37" oninput="calc(); saveSettings();"></div>
                     <div><span class="input-label">L4 Rate ($)</span><input type="number" id="rateL4" value="36.12" oninput="calc(); saveSettings();"></div>
                     <div><span class="input-label">L3 Rate ($)</span><input type="number" id="rateL3" value="34.32" oninput="calc(); saveSettings();"></div>
@@ -213,6 +222,14 @@
         document.getElementById('nav-entry').classList.toggle('active', idx === 0); 
         document.getElementById('nav-settings').classList.toggle('active', idx === 1); 
         window.scrollTo(0,0);
+    }
+
+    function toggleRates() {
+        let el = document.getElementById('rate-content');
+        let arrow = document.getElementById('rate-arrow');
+        el.classList.toggle('show');
+        if(el.classList.contains('show')) { arrow.innerText = '▼'; }
+        else { arrow.innerText = '▶'; }
     }
 
     function getRate(level) {
