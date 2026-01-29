@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PayCheck Ledger V3.3.3</title>
+    <title>PayCheck Ledger V3.4</title>
     <style>
         :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
         * { box-sizing: border-box; }
@@ -221,7 +221,7 @@
                         <option value="2027">2027 LEDGER</option>
                         <option value="2028">2028 LEDGER</option>
                     </select>
-                    <div style="font-size:10px; color:#888;">PAYCHECK LEDGER V3.3.2</div>
+                    <div style="font-size:10px; color:#888;">PAYCHECK LEDGER V3.</div>
                 </div>
                 <div style="display:flex; align-items:center;">
                     <div class="dash-stats"><div id="header-ytd-label">EST. GROSS YTD</div><div class="ytd-val" id="header-ytd-gross">$0.00</div></div>
@@ -450,6 +450,19 @@
         let minsPart = parts[1];
         let minutes = parseInt(minsPart) || 0;
         return hours + (minutes / 60);
+    }
+     function calcLoanStatus(loanKey, checkDate, amount) {
+        let prefix = (loanKey === 'l1') ? 'l1' : 'l2';
+        let total = parseInt(document.getElementById(prefix+'-total').value) || 0;
+        let finalDateStr = document.getElementById(prefix+'-date').value;
+        if (total === 0 || !finalDateStr) return { paid: 0, total: 0, rem: 0, bal: 0 };
+        let finalDate = new Date(finalDateStr);
+        let diffTime = finalDate - checkDate;
+        let periodsLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 14)); 
+        if(periodsLeft < 0) periodsLeft = 0;
+        let currentPay = total - periodsLeft + 1;
+        if(currentPay > total) currentPay = total;
+        return { paid: currentPay, total: total, rem: periodsLeft, bal: periodsLeft * amount };
     }
 
     function showGhost(el) {
@@ -794,19 +807,7 @@
         } catch(e) { console.log("Vacation UI Update skipped"); }
     }
     
-    function calcLoanStatus(loanKey, checkDate, amount) {
-        let prefix = (loanKey === 'l1') ? 'l1' : 'l2';
-        let total = parseInt(document.getElementById(prefix+'-total').value) || 0;
-        let finalDateStr = document.getElementById(prefix+'-date').value;
-        if (total === 0 || !finalDateStr) return { paid: 0, total: 0, rem: 0, bal: 0 };
-        let finalDate = new Date(finalDateStr);
-        let diffTime = finalDate - checkDate;
-        let periodsLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 14)); 
-        if(periodsLeft < 0) periodsLeft = 0;
-        let currentPay = total - periodsLeft + 1;
-        if(currentPay > total) currentPay = total;
-        return { paid: currentPay, total: total, rem: periodsLeft, bal: periodsLeft * amount };
-    }
+   
 
     function calc() {
         try {
