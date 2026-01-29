@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PayCheck Ledger V3.3.2</title>
+    <title>PayCheck Ledger V3.3.3</title>
     <style>
-        :root { --bg: #000000; --app-bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
+        :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
+        * { box-sizing: border-box; }
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; min-height: 100vh; }
         
@@ -14,13 +15,13 @@
         input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
         /* V3.3 CONTAINER */
-        .desktop-container { width: 100%; max-width: 480px; background: var(--app-bg); min-height: 100vh; border-left: 1px solid #222; border-right: 1px solid #222; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255,255,255,0.05); }
+        .desktop-container { width: 100%; max-width: 950px; background: var(--app-bg); min-height: 100vh; border-left: 1px solid #222; border-right: 1px solid #222; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(255,255,255,0.05); }
 
         /* VIEWS - Increased Padding to Prevent Bunching */
         #dashboard-view { display: block; padding: 130px 10px 40px 10px; }
         
         /* FIXED: YTD Container Vertical Stack */
-        #ytd-container { display: none; flex-direction: column; gap: 15px; padding: 130px 10px 80px 10px; }
+        #ytd-container { display: none; flex-direction: column; gap: 15px; padding: 0px 10px 80px 10px; }
         
         #calculator-view { display: none; padding-top: 80px; padding-bottom: 50px; background: var(--app-bg); z-index: 2000; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; }
         #settings-view { display: none; padding: 90px 15px; background: var(--app-bg); z-index: 2000; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; }
@@ -40,7 +41,7 @@
         .settings-btn { background: var(--row); color: var(--accent); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 16px; cursor: pointer; }
 
         /* SUB-VIEW NAV BARS (Calculator/Settings) */
-        .nav-bar { position: fixed; top: 0; width: 100%; max-width: 480px; height: 60px; background: rgba(18, 18, 18, 0.98); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; z-index: 2001; box-sizing: border-box; justify-content: center; }
+        .nav-bar { position: fixed; top: 0; width: 100%; max-width: 950px; height: 60px; background: rgba(18, 18, 18, 0.98); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; z-index: 2001; box-sizing: border-box; justify-content: center; }
         .nav-wrapper { width: 100%; display: flex; align-items: center; }
         .back-btn { background: transparent; border: none; color: var(--dim); font-size: 24px; padding: 0 15px; cursor: pointer; }
         .period-title { flex: 1; text-align: center; }
@@ -1054,7 +1055,7 @@
                         let isFed = (key === 'fed');
                         let base = (key=='city'||key=='dues') ? totalGross : taxG; 
                         if(isFed) base = taxG; 
-                        if((settingsMap[key] || isFed) && aV !== undefined && Math.abs(dlt) > 0.05 && base > 0) { 
+                        if((settingsMap[key] || isFed) && aV !== undefined && Math.abs(dlt) > 0.02 && base > 0) { 
                             btn.classList.add('show'); btn.innerText = "↺ RATE";
                             btn.onclick = function() { requestRateUpdate(deductionLabels[key], aV, base, (isFed ? 'fedTaxRate' : settingsMap[key]), deductionLabels[key]); }; 
                         } else { btn.classList.remove('show'); } 
