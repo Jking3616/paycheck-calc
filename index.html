@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PayCheck Ledger V3.4.1 Gold)</title>
+    <title>PayCheck Ledger V3.5</title>
     <style>
         :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
         * { box-sizing: border-box; }
@@ -27,8 +27,8 @@
         #settings-view { display: none; padding: 90px 15px; background: var(--app-bg); z-index: 2000; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; }
         #vacation-view { display: none; padding: 90px 15px; background: var(--app-bg); z-index: 2000; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; } 
 
-        /* MAIN HEADER (Dashboard Only) */
-        .dash-header { position: absolute; top: 0; left: 0; width: 100%; background: rgba(18, 18, 18, 0.98); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        /* MAIN HEADER (Pinned & Centered) */
+        .dash-header { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 950px; background: rgba(18, 18, 18, 0.98); z-index: 1000; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
         .dash-header.hidden { display: none; } /* JS Helper */
         
         .header-wrapper { width: 100%; }
@@ -236,10 +236,13 @@
             <div class="header-top">
                 <div>
                     <select id="year-selector" class="year-selector" onchange="switchYear(this.value)">
-                        <option value="2026" selected>2026 LEDGER</option>
-                        <option value="2027">2027 LEDGER</option>
-                        <option value="2028">2028 LEDGER</option>
-                    </select>
+    <option value="2026" selected>2026 LEDGER</option>
+    <option value="2027">2027 LEDGER</option>
+    <option value="2028">2028 LEDGER</option>
+    <option value="2029">2029 LEDGER</option>
+    <option value="2030">2030 LEDGER</option>
+    <option value="2031">2031 LEDGER</option>
+</select>
                     <div style="font-size:10px; color:#888;">PAYCHECK LEDGER V3.4.1 (Gold) </div>
                 </div>
                 <div style="display:flex; align-items:center;">
@@ -651,7 +654,8 @@
             container.innerHTML += `<div class="pay-card ${statusClass} ${p.isEarly?'early-pay':''}" onclick="openPeriod(${p.id})" data-ref-section="Dashboard" data-ref-selector=".pay-card"><div class="date-badge" onclick="resetSingleCheck(${p.id}, event)">#${p.id}</div><div class="card-info"><span class="pay-date-label">${p.payDate} Paycheck</span><span class="period-range">${p.fullRange}</span>${depBadge}</div><div class="card-total">${val}</div></div>`;
         });
         document.getElementById('header-ytd-label').innerText = "EST. GROSS YTD";
-        document.getElementById('header-ytd-gross').innerText = f(totalEstGrossVal);
+       document.getElementById('header-ytd-gross').innerText = f(totalEstGrossVal);
+        autoScroll(); // V3.5 Trigger Scroll
     }
 
     /* V3.3.2 HEADER TOGGLE LOGIC */
@@ -1468,6 +1472,32 @@
             if(dStr === selectedStr) cls += ' selected';
             grid.innerHTML += `<div class="${cls}" onclick="lcSelectDate('${dStr}')">${d}</div>`;
         }
+    }
+
+    /* V3.5 AUTO-SCROLL ENGINE */
+    function autoScroll() {
+        // Wait 100ms for the screen to paint, then slide
+        setTimeout(() => {
+            let cards = document.querySelectorAll('.pay-card');
+            let target = null;
+            
+            // Find first NON-VERIFIED card
+            for(let c of cards) {
+                if(!c.classList.contains('verified')) { target = c; break; }
+            }
+            
+            // If we found one, scroll to it
+            if(target) {
+                let headerOffset = 135; // Height of header + bit of breathing room
+                let elementPosition = target.getBoundingClientRect().top;
+                let offsetPosition = elementPosition + window.scrollY - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
+        }, 100);
     }
 
     init();
