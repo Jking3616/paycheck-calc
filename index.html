@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PayCheck Ledger V3.4</title>
+    <title>PayCheck Ledger V3.4.1 Gold)</title>
     <style>
         :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
         * { box-sizing: border-box; }
@@ -70,28 +70,47 @@
         .card-total { font-size: 14px; font-weight: 700; color: var(--dim); text-align: right; font-family: monospace; }
 
         /* DAY CARD */
-        .day-card { display: flex; background: var(--row); margin: 0 10px 6px 10px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; min-height: 55px; transition: 0.2s; position:relative; }
-        .day-card.ro-active { opacity: 0.6; border: 1px solid var(--danger); background: rgba(255, 82, 82, 0.05); }
+        /* V3.4.1 HYBRID THEME (Brighter BG) */
+        .day-card { display: flex; background: var(--card); margin: 0 10px 6px 10px; border-radius: 8px; border: 1px solid #333; overflow: hidden; min-height: 55px; transition: 0.2s; position:relative; }
         
-        .day-card.status-hol .day-label-col { background: var(--hol-work); border-right: 1px solid #9c27b0; }
+        /* STATUS STATES */
+        .day-card.status-worked { border-color: var(--electric); background: var(--card); }
+        .day-card.status-worked .day-label-col { background: var(--electric); border-right: 1px solid var(--electric); }
+        .day-card.status-worked .day-name-part { color: #fff; }
+
+        .day-card.status-xtra { border-color: var(--success); background: var(--card); }
+        .day-card.status-xtra .day-label-col { background: var(--success); border-right: 1px solid var(--success); }
+        .day-card.status-xtra .day-name-part { color: #fff; }
+
+        .day-card.status-hol { border-color: var(--hol-work); background: var(--card); }
+        .day-card.status-hol .day-label-col { background: var(--hol-work); border-right: 1px solid var(--hol-work); }
         .day-card.status-hol .day-name-part { color: #fff; }
-        .day-card.status-xtra .day-label-col { background: rgba(0, 200, 83, 0.2); border-right: 1px solid var(--success); }
-        .day-card.status-xtra .day-name-part { color: var(--success); }
+
+        .day-card.status-vac { border-color: var(--vacation); background: rgba(255, 111, 0, 0.1); }
         .day-card.status-vac .day-label-col { background: var(--vacation); border-right: 1px solid var(--vacation); }
         .day-card.status-vac .day-name-part { color: #000; }
-        .day-card.hol-unworked { border: 2px solid var(--hol-off); box-shadow: 0 0 5px rgba(123, 31, 162, 0.4); }
-        .day-card.hol-unworked .day-label-col { background: #38006b; }
-        .day-card.hol-unworked .day-name-part { color: #fff; }
 
-        .day-label-col { width: 30px; background: var(--border); display: flex; flex-direction: column; transition: 0.2s; flex-shrink: 0; }
-        .day-name-part { flex: 2; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; transform: rotate(180deg); text-transform: uppercase; font-size: 10px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
-        .day-date-part { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; border-top: 1px solid rgba(0,0,0,0.5); background: rgba(0,0,0,0.3); padding: 4px 0; }
+        /* UNWORKED STATE (Stealth) */
+        .day-label-col { width: 30px; background: #1a1a1a; display: flex; flex-direction: column; transition: 0.2s; flex-shrink: 0; border-right: 1px solid #333; }
+        .day-name-part { flex: 2; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; transform: rotate(180deg); text-transform: uppercase; font-size: 10px; font-weight: 900; color: #444; letter-spacing: 1px; }
+        .day-date-part { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #666; border-top: 1px solid #222; background: #111; padding: 4px 0; }
+        
         .day-content { flex: 1; padding: 6px; display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
         .dc-left { display: flex; flex-direction: column; gap: 3px; flex-grow: 1; max-width: 220px; }
-        
+
+        /* BUTTONS */
         .time-row { display: flex; align-items: center; gap: 4px; }
-        .btn-12 { width: 60px; height: 36px; border: none; border-radius: 4px; background: var(--accent); color: white; font-weight: bold; font-size: 11px; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-        .btn-12.active { background: var(--success) !important; border: 2px solid white; box-shadow: 0 0 8px rgba(0, 200, 83, 0.4); }
+        .btn-12 { width: 60px; height: 36px; border: 1px solid #333; border-radius: 4px; background: var(--row); color: #444; font-weight: bold; font-size: 11px; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+        
+       /* V3.4.1 BUTTON COLORS (REFINED) */
+        /* Standard Worked Day = Electric Blue */
+        .btn-12.active { background: #2979ff !important; color: white !important; border: 1px solid #2979ff !important; box-shadow: 0 0 10px rgba(41, 121, 255, 0.4); }
+        
+        /* Extra Shift = Solid Green */
+        .btn-12.btn-green { background: #00c853 !important; color: white !important; border: 1px solid #00c853 !important; box-shadow: 0 0 8px rgba(0, 200, 83, 0.4); }
+        
+        /* Holiday = Solid Purple */
+        .btn-12.btn-purple { background: #7b1fa2 !important; color: white !important; border: 1px solid #fff !important; box-shadow: 0 0 8px rgba(123, 31, 162, 0.4); }
         
         .v3-input { background: #000; color: #fff; border: 1.5px solid var(--accent); border-radius: 4px; height: 36px; width: 70px; text-align: center; font-family: monospace; font-size: 12px; font-weight: 700; outline: none; }
         .v3-input:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.3); }
@@ -221,7 +240,7 @@
                         <option value="2027">2027 LEDGER</option>
                         <option value="2028">2028 LEDGER</option>
                     </select>
-                    <div style="font-size:10px; color:#888;">PAYCHECK LEDGER V3.</div>
+                    <div style="font-size:10px; color:#888;">PAYCHECK LEDGER V3.4.1 (Gold) </div>
                 </div>
                 <div style="display:flex; align-items:center;">
                     <div class="dash-stats"><div id="header-ytd-label">EST. GROSS YTD</div><div class="ytd-val" id="header-ytd-gross">$0.00</div></div>
@@ -588,8 +607,10 @@
             catMap.posttax.forEach(k => {
                 let detail = "";
                 if(k === 'l1' || k === 'l2') {
-                    let stat = calcLoanStatus(k, new Date(), 0); 
-                    if(stat.total > 0 && stat.rem < stat.total) { detail = `[Rem Bal: ${f(stat.bal)}]`; }
+                    // FIX: Grab the actual amount from settings
+                    let amt = parseFloat(document.getElementById(k === 'l1' ? 'loan1' : 'loan2').value) || 0;
+                    let stat = calcLoanStatus(k, new Date(), amt); 
+                    if(stat.total > 0) { detail = `[Rem Bal: ${f(stat.bal)}]`; }
                 }
                 postHTML += `<div class="dg-row"><span class="dg-label">${deductionLabels[k]}</span><div class="dg-detail">${detail}</div><span class="dg-amt">${f(yDed[k])}</span></div>`; 
             });
@@ -862,16 +883,30 @@
                     let dateStr = card.getAttribute('data-date');
                     let extra = false; 
                     
-                    /* V3.3 COLOR HIERARCHY LOGIC */
-                    card.classList.remove('status-hol'); card.classList.remove('status-xtra'); card.classList.remove('status-vac');
+                 /* V3.4.1 SINGLE LOGIC ENGINE */
+                    // 1. Reset Clean Slate
+                    card.className = 'day-card'; 
+                    btn.className = 'btn-12'; 
                     let sysHolName = isUnionHoliday(dateStr.split('T')[0]);
-                    
-                    if (isHol || sysHolName) {
-                        card.classList.add('status-hol');
-                    } else if (xtra) {
-                        card.classList.add('status-xtra');
-                    } else if (isVac || vacationDates.includes(dateStr.split('T')[0])) {
-                        card.classList.add('status-vac');
+
+                    // 2. Set Card Border/Background (CSS handles the color)
+                    if (isHol || sysHolName) { card.classList.add('status-hol'); } 
+                    else if (xtra) { card.classList.add('status-xtra'); } 
+                    else if (isVac || vacationDates.includes(dateStr.split('T')[0])) { card.classList.add('status-vac'); } 
+                    else if (ro) { card.classList.add('ro-active'); }
+
+                    // 3. Set Button Colors (Only if active)
+                    if (hasWork) {
+                        btn.classList.add('active'); // Turn it on
+                        
+                        if (isHol || sysHolName) { 
+                            btn.classList.add('btn-purple'); // Paint Purple
+                        } else if (xtra) { 
+                            btn.classList.add('btn-green'); // Paint Green
+                        } else {
+                            // Regular Day
+                            if (!isVac) card.classList.add('status-worked'); 
+                        }
                     }
                     
                     dayMap.push({ w: w, d: d, date: new Date(dateStr), ro: ro, hasWork: hasWork, extra: extra, xtra: xtra, isScheduled: (hasWork || ro) && !xtra, timeHrs: timeHrs });
@@ -900,16 +935,31 @@
                 }
             }
 
+            /* V3.4.2 HOLIDAY LOOP FIX */
             for (let i = 0; i < 14; i++) {
                 let dayObj = dayMap[i];
                 let card = document.getElementById(`card-${dayObj.w}-${dayObj.d}`);
                 let holCheck = document.getElementById(`hol-${dayObj.w}-${dayObj.d}`);
                 let sysHolName = isUnionHoliday(dayObj.date.toISOString().split('T')[0]);
+                
+                // Clear old holiday styles
                 card.classList.remove('hol-worked', 'hol-unworked');
+                
+                // Check if it's a holiday (System OR Manual Checkbox)
                 let isHoliday = (sysHolName !== null) || (holCheck && holCheck.checked);
+                
                 if (isHoliday) { 
-                    if (dayObj.hasWork) { card.classList.add('hol-worked'); if(holCheck) holCheck.checked = true; } 
-                    else { if(!dayObj.ro) { card.classList.add('hol-unworked'); if(holCheck) holCheck.checked = true; GT.uhC += (bidRate * 8); GT.uhH += 8; } } 
+                    if (dayObj.hasWork) { 
+                        card.classList.add('hol-worked'); 
+                        // REMOVED: if(holCheck) holCheck.checked = true; (This fixed the stuck box)
+                    } else { 
+                        if(!dayObj.ro) { 
+                            card.classList.add('hol-unworked'); 
+                            // REMOVED: if(holCheck) holCheck.checked = true; (This fixed the stuck box)
+                            GT.uhC += (bidRate * 8); 
+                            GT.uhH += 8; 
+                        } 
+                    } 
                 }
             }
 
