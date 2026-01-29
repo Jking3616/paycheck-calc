@@ -1143,8 +1143,8 @@
 
     function requestRateUpdate(l, a, t, i, sl) { 
         let r=(a/t)*100, c=parseFloat(document.getElementById(i).value); 
-        if(confirm(`Update ${sl} Rate?\n\nBased on Taxable Income: $${t.toFixed(2)}\nActual Tax: $${a.toFixed(2)}\n\nNew Rate: ${r.toFixed(5)}%\nCurrent: ${c}%`)) { 
-            document.getElementById(i).value=r.toFixed(5); saveSettings(); calc(); 
+        if(confirm(`Update ${sl} Rate?\n\nBased on Taxable Income: $${t.toFixed(2)}\nActual Tax: $${a.toFixed(2)}\n\nNew Rate: ${r.toFixed(4)}%\nCurrent: ${c}%`)) { 
+            document.getElementById(i).value=r.toFixed(4); saveSettings(); calc(); 
         } 
     }
 
@@ -1189,9 +1189,9 @@
         let g=parseFloat(document.getElementById('rt-gross').value)||0, t=parseFloat(document.getElementById('rt-tax').value)||0; 
         let kP=parseFloat(document.getElementById('kRate').value)||0;
         let taxable = g - (g * (kP/100));
-        if(taxable>0) document.getElementById('rt-result').innerText = ((t/taxable)*100).toFixed(5)+'%'; 
+        if(taxable>0) document.getElementById('rt-result').innerText = ((t/taxable)*100).toFixed(4)+'%'; 
     }
-    function applyRate(targetId) { let res = document.getElementById('rt-result').innerText; if(res !== '0.000%') { document.getElementById(targetId).value = parseFloat(res).toFixed(5); calc(); saveSettings(); alert('Updated!'); } }
+    function applyRate(targetId) { let res = document.getElementById('rt-result').innerText; if(res !== '0.000%') { document.getElementById(targetId).value = parseFloat(res).toFixed(4); calc(); saveSettings(); alert('Updated!'); } }
 
     function openSettings() { 
         toggleMainHeader(false);
