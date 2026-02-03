@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PayCheck Ledger V3.5.1</title>
+    <title>PayCheck Ledger V3.5.3</title>
     <style>
         :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; }
         * { box-sizing: border-box; }
@@ -787,7 +787,7 @@
         return html;
     }
 
-   /* V3.5.1 UI RENDERER (With DQ Checkbox) */
+   /* V3.5.2 UI RENDERER (Nuclear Triggers) */
     function renderCalculator(pStart) {
         const container = document.getElementById('calculator-content'); container.innerHTML = "";
         let r5 = document.getElementById('rateL5').value, r4 = document.getElementById('rateL4').value, r3 = document.getElementById('rateL3').value, r2 = document.getElementById('rateL2').value, r1 = document.getElementById('rateL1').value;
@@ -806,8 +806,8 @@
                 let curDateStr = cur.toISOString().split('T')[0];
                 let isHol = isUnionHoliday(curDateStr);
                 
-                // V3.5.1: Add DQ Checkbox (Hidden on Sunday)
-                let holHTML = isSun ? '' : `<label class="cb-label hol"><input type="checkbox" id="hol-${w}-${i}" onchange="calc()">HOL</label>`;
+                // V3.5.2: Triggers updated to toggleSmart()
+                let holHTML = isSun ? '' : `<label class="cb-label hol"><input type="checkbox" id="hol-${w}-${i}" onchange="toggleSmart(${w},${i})">HOL</label>`;
                 let dqHTML = isSun ? '' : `<label class="cb-label ro" style="border-color:#ff5252; color:#ff5252; margin-left:2px;"><input type="checkbox" id="dq-${w}-${i}" onchange="calc()">DQ</label>`;
                 
                 container.innerHTML += `
@@ -827,7 +827,7 @@
                             </div>
                         </div>
                         <div class="dc-right">
-                            <label class="cb-label xtra"><input type="checkbox" id="extra-${w}-${i}" onchange="calc()">XTRA</label>
+                            <label class="cb-label xtra"><input type="checkbox" id="extra-${w}-${i}" onchange="toggleSmart(${w},${i})">XTRA</label>
                             <label class="cb-label call"><input type="checkbox" id="call-${w}-${i}" onchange="calc()">CALL</label>
                             ${holHTML}
                             ${dqHTML}
@@ -857,7 +857,28 @@
     
    
 
-    /* V3.5.1 LOGIC ENGINE (Smart Activation & Hybrid DQ) */
+    /* V3.5.2 NUCLEAR LOGIC HELPER */
+    function toggleSmart(w, d) {
+        let xtra = document.getElementById('extra-' + w + '-' + d).checked;
+        let hol = document.getElementById('hol-' + w + '-' + d);
+        let isHol = hol ? hol.checked : false; 
+        let btn = document.getElementById('btn-' + w + '-' + d);
+        let timeInput = document.getElementById('time-' + w + '-' + d);
+
+        // NUCLEAR LOGIC: If either is checked -> ON. If both unchecked -> OFF.
+        if (xtra || isHol) {
+            btn.classList.add('active');
+            btn.innerText = "12 HR";
+            timeInput.value = ""; // Clear manual time to avoid conflicts
+        } else {
+            btn.classList.remove('active');
+            btn.innerText = "12 HR";
+            timeInput.value = "";
+        }
+        calc(); // Run the math
+    }
+
+   /* V3.5.3 LOGIC ENGINE (The "Hunter" Update) */
     function calc() {
         try {
             updateVacationRateUI();
@@ -882,34 +903,19 @@
                     let roCheck = document.getElementById(`ro-${w}-${d}`);
                     let xtraCheck = document.getElementById(`extra-${w}-${d}`);
                     let holCheck = document.getElementById(`hol-${w}-${d}`);
-                    let dqCheck = document.getElementById(`dq-${w}-${d}`); // V3.5.1
+                    let dqCheck = document.getElementById(`dq-${w}-${d}`); 
                     
                     let ro = roCheck.checked;
                     let xtra = xtraCheck ? xtraCheck.checked : false; 
                     let isHol = holCheck ? holCheck.checked : false;
-
-                    /* V3.5.1 SMART ACTIVATION (One-Step Shot) */
-                    // If XTRA or HOL checked, and NO hours exist, Auto-Fill 12
-                    let hasWork = false;
-                    if (timeHrs > 0) { 
-                        hasWork = true; 
-                    } else if (btn.classList.contains('active') && !inputVal) { 
-                        hasWork = true; timeHrs = 12; 
-                    } else if ((xtra || isHol) && !ro && !inputVal && !btn.classList.contains('active')) {
-                        // AUTO-TRIGGER 12HR
-                        hasWork = true; timeHrs = 12; 
-                        btn.classList.add('active'); btn.innerText = "12 HR";
-                    }
-
-                    if (!hasWork) {
-                        btn.classList.remove('active'); btn.innerText = "12 HR";
-                    }
-
-                    // ... (Standard Logic Continues) ...
                     let vacCheck = document.getElementById(`vd-${w}-${d}`);
                     let isVac = vacCheck ? vacCheck.checked : false;
                     let dateStr = card.getAttribute('data-date');
                     let extra = false; 
+
+                    let hasWork = false;
+                    if (timeHrs > 0) { hasWork = true; }
+                    else if (btn.classList.contains('active')) { hasWork = true; timeHrs = 12; }
                     
                     // 1. Reset Clean Slate
                     card.className = 'day-card'; 
@@ -930,7 +936,6 @@
                         else { if (!isVac) card.classList.add('status-worked'); }
                     }
                     
-                    // Map Data (Includes RO for lookback)
                     dayMap.push({ w: w, d: d, date: new Date(dateStr), ro: ro, hasWork: hasWork, extra: extra, xtra: xtra, isScheduled: (hasWork || ro) && !xtra, timeHrs: timeHrs, dq: (dqCheck && dqCheck.checked) });
                 }
             }
@@ -954,11 +959,12 @@
                         if(vdCheck) vdCheck.checked = false;
                         document.getElementById(`btn-${w}-${k}`).classList.remove('active');
                         document.getElementById(`time-${w}-${k}`).value = "";
+                        document.getElementById(`btn-${w}-${k}`).removeAttribute('data-auto'); 
                     }
                 }
             }
 
-            /* V3.5.1 HOLIDAY HYBRID LOOP */
+            /* V3.5.3 HOLIDAY HUNTING LOGIC */
             for (let i = 0; i < 14; i++) {
                 let dayObj = dayMap[i];
                 let card = document.getElementById(`card-${dayObj.w}-${dayObj.d}`);
@@ -973,18 +979,29 @@
                         card.classList.add('hol-worked'); 
                     } else { 
                         if(!dayObj.ro) { 
-                            /* V3.5.1 AUTO-DQ LOGIC */
                             let disqualified = false;
                             
-                            // 1. Check Manual DQ
+                            // 1. Manual DQ
                             if (dayObj.dq) disqualified = true;
 
-                            // 2. Check Auto DQ (Look Behind and Ahead for RO on Scheduled Days)
+                            // 2. Auto DQ: HUNT BACKWARDS
                             if (!disqualified) {
-                                let prev = (i > 0) ? dayMap[i-1] : null;
-                                let next = (i < 13) ? dayMap[i+1] : null;
-                                if (prev && prev.isScheduled && prev.ro) disqualified = true;
-                                if (next && next.isScheduled && next.ro) disqualified = true;
+                                for (let b = i - 1; b >= 0; b--) {
+                                    if (dayMap[b].isScheduled) {
+                                        if (dayMap[b].ro) disqualified = true;
+                                        break; // Found the Last Scheduled Day, stop hunting
+                                    }
+                                }
+                            }
+
+                            // 3. Auto DQ: HUNT FORWARDS
+                            if (!disqualified) {
+                                for (let f = i + 1; f < 14; f++) {
+                                    if (dayMap[f].isScheduled) {
+                                        if (dayMap[f].ro) disqualified = true;
+                                        break; // Found the Next Scheduled Day, stop hunting
+                                    }
+                                }
                             }
 
                             if (!disqualified) {
@@ -1047,7 +1064,9 @@
                                 otPart = chunk; wk.hC += (curR * 2.5 * otPart); wk.hH += otPart; wk.incC += (curR * 2.5 * otPart);
                             } else if (isXTRA) {
                                 otPart = chunk;
-                                if(d===0) { wk.sC += (curR * 1.5 * otPart); wk.sH += otPart; } else { wk.oC += (curR * 1.5 * otPart); wk.oH += otPart; }
+                                if(d===0) { wk.sC += (curR * 1.5 * otPart); wk.sH += otPart; wk.incC += (curR * 1.5 * otPart);
+                                wk.incC += (curR * 1.5 * otPart);
+                                } else { wk.oC += (curR * 1.5 * otPart); wk.oH += otPart; }
                                 wk.incC += (curR * 1.5 * otPart);
                             } else {
                                 let space = Math.max(0, 40.00 - buck);
@@ -1089,7 +1108,7 @@
 
                 let isOpen = (w===1) ? week1Open : week2Open;
                 let cls = isOpen ? 'show' : '';
-                let wkSummaryHTML = `<div class="week-summary-grid"><div class="grid-label" style="color:#64ffda">Call Out</div><div class="grid-hours">${wk.cH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.cH>0?wk.cC/wk.cH:workRate)}</div><div class="grid-amt">${f(wk.cC)}</div><div class="grid-label" style="color:#e1bee7">Holiday UH</div><div class="grid-hours">${wk.uhH.toFixed(2)}h</div><div class="grid-rate">${fR(bidRate)}</div><div class="grid-amt">${f(wk.uhC)}</div><div class="grid-label" style="color:#ba68c8">Holiday Wk</div><div class="grid-hours">${wk.hH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.hH>0?wk.hC/wk.hH:workRate*2.5)}</div><div class="grid-amt">${f(wk.hC)}</div><div class="grid-label">Overtime</div><div class="grid-hours">${wk.oH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.oH>0?wk.oC/wk.oH:workRate*1.5)}</div><div class="grid-amt">${f(wk.oC)}</div><div class="grid-label" style="color:#ffa000">Sunday</div><div class="grid-hours">${wk.sH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.sH>0?wk.sC/wk.sH:workRate*1.5)}</div><div class="grid-amt">${f(wk.sC)}</div><div class="grid-label" style="color:#ffeb3b">Vacation</div><div class="grid-hours">${wk.vH.toFixed(2)}h</div><div class="grid-rate">${fR(GT.vH>0?GT.vC/GT.vH:vacHourly)}</div><div class="grid-amt">${f(wk.vC)}</div><div class="grid-label" style="color:#ffd700">Vaca Bonus</div><div class="grid-hours"></div><div class="grid-rate"></div><div class="grid-amt">${f(vacBonus)}</div><div class="grid-label">Regular</div><div class="grid-hours">${wk.rH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.rH>0?wk.rC/wk.rH:workRate)}</div><div class="grid-amt">${f(wk.rC)}</div><div class="grid-label" style="color:#ce93d8">Shift Diff</div><div class="grid-hours">${shiftHours.toFixed(2)}h</div><div class="grid-rate">${isDesShiftWorker?'$0.2500':'$0.0000'}</div><div class="grid-amt">${f(wkShiftPay)}</div><div class="grid-label" style="color:#b2dfdb">Incentive</div><div class="grid-hours">${(bPct*100).toFixed(1)}%</div><div class="grid-rate"></div><div class="grid-amt">${f(wk.incC*bPct)}</div><div class="grid-total"><span>Week ${w}</span><span>${f(wkGross + wkShiftPay)}</span></div></div>`;
+                let wkSummaryHTML = `<div class="week-summary-grid"><div class="grid-label" style="color:#64ffda">Call Out</div><div class="grid-hours">${wk.cH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.cH>0?wk.cC/wk.cH:workRate)}</div><div class="grid-amt">${f(wk.cC)}</div><div class="grid-label" style="color:#e1bee7">Holiday UH</div><div class="grid-hours">${wk.uhH.toFixed(2)}h</div><div class="grid-rate">${fR(bidRate)}</div><div class="grid-amt">${f(wk.uhC)}</div><div class="grid-label" style="color:#ba68c8">Holiday Wk</div><div class="grid-hours">${wk.hH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.hH>0?wk.hC/wk.hH:workRate*2.5)}</div><div class="grid-amt">${f(wk.hC)}</div><div class="grid-label">Overtime</div><div class="grid-hours">${wk.oH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.oH>0?wk.oC/wk.oH:workRate*1.5)}</div><div class="grid-amt">${f(wk.oC)}</div><div class="grid-label" style="color:#ffa000">Sunday</div><div class="grid-hours">${wk.sH.toFixed(2)}h</div><div class="grid-rate">${fR(wk.sH>0?wk.sC/wk.sH:workRate*1.5)}</div><div class="grid-amt">${f(wk.sC)}</div><div class="grid-label" style="color:#ffeb3b">Vacation</div><div class="grid-hours">${wk.vH.toFixed(2)}h</div><div class="grid-rate">${fR(GT.vH>0?GT.vC/GT.vH:vacHourly)}</div><div class="grid-amt">${f(GT.vC)}</div><div class="grid-label" style="color:#ffd700">Vaca Bonus</div><div class="grid-hours"></div><div class="grid-rate"></div><div class="grid-amt">${f(GT.vbC)}</div><div class="grid-label">Regular</div><div class="grid-hours">${GT.rH.toFixed(2)}h</div><div class="grid-rate">${fR(GT.rH>0?GT.rC/GT.rH:workRate)}</div><div class="grid-amt">${f(GT.rC)}</div><div class="grid-label" style="color:#ce93d8">Shift Diff</div><div class="grid-hours">${shiftHours.toFixed(2)}h</div><div class="grid-rate">${isDesShiftWorker?'$0.2500':'$0.0000'}</div><div class="grid-amt">${f(sAmt)}</div><div class="grid-label" style="color:#b2dfdb">Incentive</div><div class="grid-hours"></div><div class="grid-rate"></div><div class="grid-amt">${f(GT.incC)}</div><div class="grid-total"><span>Total Gross</span><span>${f(totalGross)}</span></div></div>`;
                 document.getElementById('sum-'+w).innerHTML = `<div class="wk-header" onclick="toggleWeek(${w})">WEEK ${w} SUMMARY (TAP TO TOGGLE)</div><div id="ws-${w}" class="wk-content ${cls}">${wkSummaryHTML}</div>`;
             }
 
