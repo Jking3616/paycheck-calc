@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>#1 SP AWS Paycheck Ledger V3.6.4 (Auto-Pivot)</title>
+    <title>#1 SP AWS Paycheck Ledger V3.6.5 (Auto-Pivot)</title>
     <style>
         :root { --bg: #000000; --app-bg: #000000; --card: #1e1e1e; --text: #e0e0e0; --border: #333; --row: #2a2a2a; --accent: #4dadff; --dim: #888; --success: #00c853; --danger: #ff5252; --warning: #ffb300; --gold: #ffd700; --est-yellow: #ffeb3b; --hol-work: #7b1fa2; --hol-off: #4a148c; --vacation: #ff6f00; --electric: #2979ff; }
         * { box-sizing: border-box; }
@@ -81,15 +81,18 @@
         .v3-input { background: #000; color: #fff; border: 1.5px solid var(--accent); border-radius: 4px; height: 36px; width: 70px; text-align: center; font-family: monospace; font-size: 12px; font-weight: 700; outline: none; }
         .v3-input:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.3); }
         
-        .move-up-btn { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--dim); border-radius: 4px; font-size: 8px; padding: 3px; font-weight: bold; text-transform: uppercase; transition: 0.2s; }
+        .action-btn-row { display: flex; gap: 4px; width: 100%; }
+        .move-up-btn { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--dim); border-radius: 4px; font-size: 8px; padding: 3px; font-weight: bold; text-transform: uppercase; transition: 0.2s; cursor: pointer; }
         .move-up-btn.glow-blue { border-color: var(--electric); color: var(--electric); background: rgba(41, 121, 255, 0.1); box-shadow: 0 0 5px rgba(41, 121, 255, 0.3); }
         .move-up-btn.glow-gold { border-color: var(--gold); color: var(--gold); background: rgba(255, 215, 0, 0.1); box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
         
         .extra-rate-select { display: none; background: #004d40; color: white; border: 1px solid #00695c; padding: 6px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-top: 4px; width: 100%; }
         .extra-rate-select.show { display: block; }
         
-        .move-up-zone { display: none; padding-top: 4px; grid-template-columns: 1fr 1.2fr 0.8fr; gap: 4px; }
+        .move-up-zone { display: none; padding-top: 4px; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; }
         .move-up-zone.show { display: grid; }
+        .early-stay-zone { display: none; padding-top: 4px; grid-template-columns: 1fr 1.2fr 0.8fr; gap: 4px; width: 100%; }
+        .early-stay-zone.show { display: grid; }
         
         .mt-label { display: flex; align-items: center; justify-content: center; gap:3px; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; color: var(--gold); font-size: 9px; font-weight: 800; cursor: pointer; user-select: none; }
         .mt-label input { width: 10px; height: 10px; accent-color: var(--gold); margin: 0; }
@@ -99,7 +102,6 @@
         .cb-label input { width: 12px; height: 12px; margin: 0; accent-color: var(--accent); }
         .cb-label.xtra { border-color: var(--success); color: var(--success); background: rgba(0, 200, 83, 0.1); }
         .cb-label.xtra input { accent-color: var(--success); }
-        .cb-label.call { border-color: var(--accent); color: var(--accent); }
         .cb-label.call { border-color: var(--accent); color: var(--accent); }
         .cb-label.hol { border-color: #ba68c8; color: #ba68c8; }
         .cb-label.ro { border-color: var(--danger); color: var(--danger); }
@@ -209,7 +211,7 @@
                         <option value="2030">2030 LEDGER</option>
                         <option value="2031">2031 LEDGER</option>
                     </select>
-                    <div style="font-size:10px; color:#888;">#1 SP AWS PAYCHECK LEDGER V3.6.4</div>
+                    <div style="font-size:10px; color:#888;">#1 SP AWS PAYCHECK LEDGER V3.6.5</div>
                 </div>
                 <div style="display:flex; align-items:center;">
                     <div class="dash-stats"><div id="header-ytd-label">EST. GROSS YTD</div><div class="ytd-val" id="header-ytd-gross">$0.00</div></div>
@@ -293,13 +295,13 @@
             <div class="collapsible-header" onclick="toggleCard('card1')"><span id="arrow-card1" class="arrow">▶</span><span class="pref-title">1. USER CONFIGURATION</span></div>
             <div id="card1" class="collapsible-content">
                 <span class="input-label" style="margin-top:5px; color:#4dadff;">Assigned Crew Pattern</span>
-                <select id="crew-select"><option value="D">Crew D</option><option value="B">Crew B</option><option value="C">Crew C</option><option value="A">Crew A</option></select>
+                <select id="crew-select" onchange="saveSettings()"><option value="D">Crew D</option><option value="B">Crew B</option><option value="C">Crew C</option><option value="A">Crew A</option></select>
                 <span class="input-label">Bidded Job Class</span><select id="biddedRate" onchange="calc(); saveSettings();"><option value="5">Level 5</option><option value="4">Level 4</option><option value="3">Level 3</option><option value="2">Level 2</option><option value="1">Level 1</option></select>
                 <div class="collapsible-header" onclick="document.getElementById('sched-box').classList.toggle('show');"><span class="arrow">▶</span><span class="pref-title" style="color:var(--dim); font-size:0.65em;">DIFFERENT SCHEDULED JOB CLASS?</span></div><div id="sched-box" class="collapsible-content"><span class="input-label">Scheduled Job Class</span><select id="scheduledRate" onchange="calc(); saveSettings();"><option value="0">Same as Bidded</option><option value="5">Level 5</option><option value="4">Level 4</option><option value="3">Level 3</option><option value="2">Level 2</option><option value="1">Level 1</option></select></div>
                 
-                <span class="input-label" style="margin-top:10px;">Prior Year W2 (Minus Profit Sharing)</span><input type="number" id="prevW2" placeholder="0.00" oninput="calc(); saveSettings();"><div id="vacRateDisplay" style="text-align:right; font-family:monospace; color:#ffeb3b;">Vacation Rate: $0.00 / hr</div>
-                <span class="input-label" style="margin-top:10px;">Default Incentive Forecast (%)</span><input type="number" id="defInc" placeholder="Min % if you feel confident. Default = 0" oninput="saveSettings();">
-                <span class="input-label" style="margin-top:10px;">Hire Date (Continuous Service)</span><div style="display:grid; grid-template-columns: 2fr 1fr; gap:5px;"><input type="date" id="hire-date" onchange="saveSettings()"><input type="number" id="hire-year-manual" placeholder="Year" oninput="quickSetYear(this.value)"></div>
+                <span class="input-label" style="margin-top:10px;">Prior Year W2 (Minus Profit Sharing)</span><input type="number" id="prevW2" placeholder="0.00" onchange="calc(); saveSettings();"><div id="vacRateDisplay" style="text-align:right; font-family:monospace; color:#ffeb3b;">Vacation Rate: $0.00 / hr</div>
+                <span class="input-label" style="margin-top:10px;">Default Incentive Forecast (%)</span><input type="number" id="defInc" placeholder="Can be set to a min % if you feel confident. Default = 0" onchange="saveSettings();">
+                <span class="input-label" style="margin-top:10px;">Hire Date (Continuous Service)</span><div style="display:grid; grid-template-columns: 2fr 1fr; gap:5px;"><input type="date" id="hire-date" onchange="saveSettings()"><input type="number" id="hire-year-manual" placeholder="Year" onchange="quickSetYear(this.value)"></div>
                 <button class="apply-btn" style="width:100%; font-size:14px; background:linear-gradient(135deg, #ff6f00, #e65100); color:white; font-weight:900; margin-top:10px;" onclick="openVacationView()">OPEN VACATION PLANNER</button>
             </div>
         </div>
@@ -311,49 +313,49 @@
                     <button class="tab-sub" id="ts-contract" onclick="switchContractTab('contract')">CONTRACT PLANNER</button>
                 </div>
                 <div id="cv-current" class="contract-view-content show" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><span class="input-label">L5 Rate ($)</span><input type="number" id="rateL5" placeholder="38.37" oninput="calc(); saveSettings();"></div><div><span class="input-label">L4 Rate ($)</span><input type="number" id="rateL4" placeholder="36.12" oninput="calc(); saveSettings();"></div><div><span class="input-label">L3 Rate ($)</span><input type="number" id="rateL3" placeholder="34.32" oninput="calc(); saveSettings();"></div><div><span class="input-label">L2 Rate ($)</span><input type="number" id="rateL2" placeholder="31.21" oninput="calc(); saveSettings();"></div><div><span class="input-label">L1 Rate ($)</span><input type="number" id="rateL1" placeholder="28.51" oninput="calc(); saveSettings();"></div><div><span class="input-label" style="color:var(--gold);">Meal Ticket ($)</span><input type="number" id="mt-val" placeholder="16.17" oninput="saveSettings()"></div>
+                    <div><span class="input-label">L5 Rate ($)</span><input type="number" id="rateL5" placeholder="38.37" onchange="calc(); saveSettings();"></div><div><span class="input-label">L4 Rate ($)</span><input type="number" id="rateL4" placeholder="36.12" onchange="calc(); saveSettings();"></div><div><span class="input-label">L3 Rate ($)</span><input type="number" id="rateL3" placeholder="34.32" onchange="calc(); saveSettings();"></div><div><span class="input-label">L2 Rate ($)</span><input type="number" id="rateL2" placeholder="31.21" onchange="calc(); saveSettings();"></div><div><span class="input-label">L1 Rate ($)</span><input type="number" id="rateL1" placeholder="28.51" onchange="calc(); saveSettings();"></div><div><span class="input-label" style="color:var(--gold);">Meal Ticket ($)</span><input type="number" id="mt-val" placeholder="16.17" onchange="saveSettings()"></div>
                 </div>
                 <div id="cv-contract" class="contract-view-content">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><input type="checkbox" id="enable-contract" onchange="saveSettings()"><span style="font-weight:bold; font-size:13px;">Enable Contract Logic</span></div>
                     <span class="input-label">Contract Start Date</span><input type="date" id="contract-start" onchange="saveSettings()">
                     <span class="input-label">Raise Type</span><select id="raise-type" onchange="saveSettings()"><option value="pct">Percentage (%)</option><option value="amt">Fixed Amount ($)</option></select>
                     <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
-                        <div><span class="input-label">Yr 1 Raise</span><input type="number" id="raise-1" placeholder="0.00" oninput="saveSettings()"></div>
-                        <div><span class="input-label">Yr 2 Raise</span><input type="number" id="raise-2" placeholder="0.00" oninput="saveSettings()"></div>
-                        <div><span class="input-label">Yr 3 Raise</span><input type="number" id="raise-3" placeholder="0.00" oninput="saveSettings()"></div>
+                        <div><span class="input-label">Yr 1 Raise</span><input type="number" id="raise-1" placeholder="0.00" onchange="saveSettings()"></div>
+                        <div><span class="input-label">Yr 2 Raise</span><input type="number" id="raise-2" placeholder="0.00" onchange="saveSettings()"></div>
+                        <div><span class="input-label">Yr 3 Raise</span><input type="number" id="raise-3" placeholder="0.00" onchange="saveSettings()"></div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card3')"><span id="arrow-card3" class="arrow">▶</span><span class="pref-title">3. SMART RATE FINDER</span></div><div id="card3" class="collapsible-content"><div id="rate-tool" class="rate-tool-box" style="display:block; margin-bottom:5px;"><div style="font-size:10px; color:#888; margin-bottom:5px;">Calculates rate based on Gross minus 401k Setting</div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"><input type="number" id="rt-gross" placeholder="Total Gross"><input type="number" id="rt-tax" placeholder="Tax Paid ($)"></div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;"><button onclick="calcRateResult()" style="background:var(--accent); color:white; border:none; padding:6px 15px; border-radius:4px; font-weight:bold; font-size:12px;">CALCULATE</button><span id="rt-result" style="font-weight:800; color:var(--success); font-size:18px;">0.000%</span></div><div class="rt-actions" style="grid-template-columns: 1fr 1fr;"><button class="apply-btn" onclick="applyRate('fedTaxRate')">SET FED RATE</button><button class="apply-btn" onclick="applyRate('stateTaxRate')">SET STATE RATE</button></div></div></div></div>
-        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card4')"><span id="arrow-card4" class="arrow">▶</span><span class="pref-title">4. TAX & RETIREMENT (%)</span></div><div id="card4" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">401k %</span><input type="number" id="kRate" oninput="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">Fed W/H %</span><input type="number" id="fedTaxRate" oninput="calc(); saveSettings();" enterkeyhint="next"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">Ohio W/H %</span><input type="number" id="stateTaxRate" value="2.75" oninput="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">City %</span><input type="number" id="cityTaxRate" value="2.5" oninput="calc(); saveSettings();" enterkeyhint="next"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">FICA EE %</span><input type="number" id="ficaRate" value="6.2" oninput="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">Fed MWT EE %</span><input type="number" id="medRate" value="1.45" oninput="calc(); saveSettings();" enterkeyhint="next"></div></div></div></div>
-        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card5')"><span id="arrow-card5" class="arrow">▶</span><span class="pref-title">5. FLAT DEDUCTIONS ($)</span></div><div id="card5" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">USW Dues %</span><input type="number" id="duesRate" value="1.45" oninput="calc(); saveSettings();"></div><div><span class="input-label">Charity</span><input type="number" id="charity" oninput="calc(); saveSettings();"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">OPTL Life EE</span><input type="number" id="lifeEE" oninput="calc(); saveSettings();"></div><div><span class="input-label">Addl Optional</span><input type="number" id="addOpt" oninput="calc(); saveSettings();"></div></div>
+        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card4')"><span id="arrow-card4" class="arrow">▶</span><span class="pref-title">4. TAX & RETIREMENT (%)</span></div><div id="card4" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">401k %</span><input type="number" id="kRate" onchange="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">Fed W/H %</span><input type="number" id="fedTaxRate" onchange="calc(); saveSettings();" enterkeyhint="next"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">Ohio W/H %</span><input type="number" id="stateTaxRate" value="2.75" onchange="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">City %</span><input type="number" id="cityTaxRate" value="2.5" onchange="calc(); saveSettings();" enterkeyhint="next"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">FICA EE %</span><input type="number" id="ficaRate" value="6.2" onchange="calc(); saveSettings();" enterkeyhint="next"></div><div><span class="input-label">Fed MWT EE %</span><input type="number" id="medRate" value="1.45" onchange="calc(); saveSettings();" enterkeyhint="next"></div></div></div></div>
+        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card5')"><span id="arrow-card5" class="arrow">▶</span><span class="pref-title">5. FLAT DEDUCTIONS ($)</span></div><div id="card5" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">USW Dues %</span><input type="number" id="duesRate" value="1.45" onchange="calc(); saveSettings();"></div><div><span class="input-label">Charity</span><input type="number" id="charity" onchange="calc(); saveSettings();"></div></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">OPTL Life EE</span><input type="number" id="lifeEE" onchange="calc(); saveSettings();"></div><div><span class="input-label">Addl Optional</span><input type="number" id="addOpt" onchange="calc(); saveSettings();"></div></div>
         <div style="margin-top:15px; border-top:1px solid #333; padding-top:10px;">
             <span style="color:var(--accent); font-size:11px; font-weight:bold;">LOAN 1 TRACKER</span>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
-                <div><span class="input-label">Amount</span><input type="number" id="loan1" oninput="calc(); saveSettings();"></div>
-                <div><span class="input-label">Total Pymts</span><input type="number" id="l1-total" placeholder="#" oninput="calc(); saveSettings();"></div>
+                <div><span class="input-label">Amount</span><input type="number" id="loan1" onchange="calc(); saveSettings();"></div>
+                <div><span class="input-label">Total Pymts</span><input type="number" id="l1-total" placeholder="#" onchange="calc(); saveSettings();"></div>
                 <div><span class="input-label">Final Date</span><input type="text" id="l1-date" readonly onclick="openLoanCalendar('l1')"></div>
             </div>
         </div>
         <div style="margin-top:10px;">
             <span style="color:var(--accent); font-size:11px; font-weight:bold;">LOAN 2 TRACKER</span>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
-                <div><span class="input-label">Amount</span><input type="number" id="loan2" oninput="calc(); saveSettings();"></div>
-                <div><span class="input-label">Total Pymts</span><input type="number" id="l2-total" placeholder="#" oninput="calc(); saveSettings();"></div>
+                <div><span class="input-label">Amount</span><input type="number" id="loan2" onchange="calc(); saveSettings();"></div>
+                <div><span class="input-label">Total Pymts</span><input type="number" id="l2-total" placeholder="#" onchange="calc(); saveSettings();"></div>
                 <div><span class="input-label">Final Date</span><input type="text" id="l2-date" readonly onclick="openLoanCalendar('l2')"></div>
             </div>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-top:10px;"><div><span class="input-label" style="color:var(--danger)">Garnishments ($)</span><input type="number" id="garnishment" oninput="calc(); saveSettings();"></div></div></div></div>
+        <div style="display:grid; grid-template-columns: 1fr; gap:10px; margin-top:10px;"><div><span class="input-label" style="color:var(--danger)">Garnishments ($)</span><input type="number" id="garnishment" onchange="calc(); saveSettings();"></div></div></div></div>
         <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card6')"><span id="arrow-card6" class="arrow">▶</span><span class="pref-title">6. NET PAY DISTRIBUTION</span></div><div id="card6" class="collapsible-content">
             <div style="margin-bottom:5px; color:#888; font-size:10px;">Deduct amounts to see actual Deposit.</div>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
-                <div><span class="input-label">Sec. Acct 1</span><input type="number" id="dist1" placeholder="0.00" oninput="saveSettings(); renderDashboard();"></div>
-                <div><span class="input-label">Sec. Acct 2</span><input type="number" id="dist2" placeholder="0.00" oninput="saveSettings(); renderDashboard();"></div>
-                <div><span class="input-label">Sec. Acct 3</span><input type="number" id="dist3" placeholder="0.00" oninput="saveSettings(); renderDashboard();"></div>
+                <div><span class="input-label">Sec. Acct 1</span><input type="number" id="dist1" placeholder="0.00" onchange="saveSettings(); renderDashboard();"></div>
+                <div><span class="input-label">Sec. Acct 2</span><input type="number" id="dist2" placeholder="0.00" onchange="saveSettings(); renderDashboard();"></div>
+                <div><span class="input-label">Sec. Acct 3</span><input type="number" id="dist3" placeholder="0.00" onchange="saveSettings(); renderDashboard();"></div>
             </div>
         </div></div>
-        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card7')"><span id="arrow-card7" class="arrow">▶</span><span class="pref-title">7. DUES CALIBRATION</span></div><div id="card7" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">Hourly Factor</span><input type="number" id="duesCapFactor" value="1.2923" oninput="calc(); saveSettings();"></div><div><span class="input-label">Hourly Rate ($)</span><input type="number" id="duesHrRate" value="0.02" oninput="calc(); saveSettings();"></div></div><div style="margin-top:5px; color:#666; font-size:10px;">App automatically selects the lower option between 1.45% of Gross vs. Hourly Factor Cap.</div></div></div>
+        <div class="pref-card"><div class="collapsible-header" onclick="toggleCard('card7')"><span id="arrow-card7" class="arrow">▶</span><span class="pref-title">7. DUES CALIBRATION</span></div><div id="card7" class="collapsible-content"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div><span class="input-label">Hourly Factor</span><input type="number" id="duesCapFactor" value="1.2923" onchange="calc(); saveSettings();"></div><div><span class="input-label">Hourly Rate ($)</span><input type="number" id="duesHrRate" value="0.02" onchange="calc(); saveSettings();"></div></div><div style="margin-top:5px; color:#666; font-size:10px;">App automatically selects the lower option between 1.45% of Gross vs. Hourly Factor Cap.</div></div></div>
         <button class="reset-btn" onclick="resetCheckData()">RESET CHECK DATA</button><button class="reset-btn" style="margin-top:10px; border-color:var(--dim); color:var(--dim);" onclick="resetSettings()">RESET APP SETTINGS</button>
     </div>
     <div id="vacation-view"><div class="nav-bar"><div class="nav-wrapper"><button class="back-btn" onclick="closeVacationView()">❮</button><div class="period-title"><span class="pt-main">VACATION PLANNER</span></div><button class="close-set-btn" onclick="closeVacationView()">DONE</button></div></div><div class="summary-box"><div class="sum-row" style="border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:10px;"><span>Split Weeks (WAD):</span><select id="wad-select" style="width:100px; background:#222; border:none; color:var(--warning); font-weight:bold; padding:2px;" onchange="saveSettings(); updateVacSummary();"><option value="0">0 Weeks</option><option value="1">1 Week</option><option value="2">2 Weeks</option></select></div><div class="sum-row"><span>Entitlement:</span><span id="vac-total-ent" class="sum-val">0 Weeks</span></div><div class="sum-row" style="color:var(--success)"><span>Weeks Left:</span><span id="vac-blocks-left" class="sum-val">0</span></div><div class="sum-row" style="color:var(--warning)"><span>Days Left:</span><span id="vac-days-left" class="sum-val">0</span></div></div><div id="calendar-container"></div></div>
@@ -627,7 +629,13 @@
     }
 
     function openSettings() { toggleMainHeader(false); document.getElementById('dashboard-view').style.display='none'; document.getElementById('settings-view').style.display='block'; window.scrollTo(0,0); }
-    function closeSettings() { document.getElementById('settings-view').style.display='none'; toggleMainHeader(true); document.getElementById('dashboard-view').style.display='block'; }
+    function closeSettings() { 
+        // Force an overarching save to finalize any on-the-fly typing that missed the trigger.
+        saveSettings();
+        document.getElementById('settings-view').style.display='none'; 
+        toggleMainHeader(true); 
+        document.getElementById('dashboard-view').style.display='block'; 
+    }
 
     function applySchedule(periodStart) { 
         try { 
@@ -771,10 +779,17 @@
                                 <input type="number" class="v3-input" id="time-${w}-${i}" placeholder="0.00" oninput="handleManualInput(${w},${i})" onfocus="showGhost(this)">
                                 <select id="extra-rate-${w}-${i}" class="extra-rate-select" onchange="calc()">${optHTML}</select>
                             </div>
-                            <button class="move-up-btn" id="toggle-${w}-${i}" onclick="toggleZone(${w},${i})">MOVE UP / STAY OVER</button>
-                            <div class="move-up-zone" id="zone-${w}-${i}">
+                            <div class="action-btn-row">
+                                <button class="move-up-btn" id="toggle-mu-${w}-${i}" onclick="toggleZone('mu', ${w},${i})">MOVE UP</button>
+                                <button class="move-up-btn" id="toggle-es-${w}-${i}" onclick="toggleZone('es', ${w},${i})">EARLY / STAY-OVER</button>
+                            </div>
+                            <div class="move-up-zone" id="zone-mu-${w}-${i}">
                                 <input type="number" id="step-hrs-${w}-${i}" placeholder="Hrs" oninput="calc()">
                                 <select id="step-rate-${w}-${i}" onchange="calc()">${stepHTML}</select>
+                            </div>
+                            <div class="early-stay-zone" id="zone-es-${w}-${i}">
+                                <input type="number" id="es-hrs-${w}-${i}" placeholder="Hrs" oninput="calc()">
+                                <select id="es-rate-${w}-${i}" onchange="calc()">${stepHTML}</select>
                                 <label class="mt-label"><input type="checkbox" id="mt-${w}-${i}" onchange="calc()"> TICKET</label>
                             </div>
                         </div>
@@ -862,15 +877,23 @@
                     let dateStr = card.getAttribute('data-date');
                     let extra = false; 
 
-                    let toggleBtn = document.getElementById(`toggle-${w}-${d}`);
+                    let toggleBtnMU = document.getElementById(`toggle-mu-${w}-${d}`);
+                    let toggleBtnES = document.getElementById(`toggle-es-${w}-${d}`);
                     let stepH = document.getElementById(`step-hrs-${w}-${d}`).value;
                     let stepR = document.getElementById(`step-rate-${w}-${d}`).value;
-                    toggleBtn.classList.remove('glow-gold', 'glow-blue');
+                    let esH = document.getElementById(`es-hrs-${w}-${d}`).value;
+                    let esR = document.getElementById(`es-rate-${w}-${d}`).value;
+
+                    toggleBtnMU.classList.remove('glow-blue');
+                    toggleBtnES.classList.remove('glow-gold', 'glow-blue');
                     
+                    if (stepH !== "" || stepR !== "0") {
+                        toggleBtnMU.classList.add('glow-blue');
+                    }
                     if(mtCheck && mtCheck.checked) {
-                        toggleBtn.classList.add('glow-gold');
-                    } else if (stepH !== "" || stepR !== "0") {
-                        toggleBtn.classList.add('glow-blue');
+                        toggleBtnES.classList.add('glow-gold');
+                    } else if (esH !== "" || esR !== "0") {
+                        toggleBtnES.classList.add('glow-blue');
                     }
 
                     let hasWork = false;
@@ -993,26 +1016,49 @@
                         let hasWork = dayMap[dayIdx].hasWork;
                         if(!hasWork) continue; 
 
+                        // Pull rates from inputs
                         let exV = document.getElementById(`extra-rate-${w}-${d}`).value;
                         let eR = (exV != "0") ? getRate(exV) : workRate; 
+                        
                         let stH = parseFloat(document.getElementById(`step-hrs-${w}-${d}`).value) || 0;
                         let stV = document.getElementById(`step-rate-${w}-${d}`).value;
                         let stR = (stV != "0") ? getRate(stV) : 0;
+
+                        let esH = parseFloat(document.getElementById(`es-hrs-${w}-${d}`).value) || 0;
+                        let esV = document.getElementById(`es-rate-${w}-${d}`).value;
+                        let esR = (esV != "0") ? getRate(esV) : workRate;
+
                         let isXTRA = document.getElementById(`extra-${w}-${d}`)?.checked;
                         if(document.getElementById(`call-${w}-${d}`).checked) { wk.cC += (eR * 2); wk.cH += 2; }
                         let holCheck = document.getElementById(`hol-${w}-${d}`);
                         let isHoliday = (holCheck && holCheck.checked); 
                         
-                        // NEW LOGIC: Fills bucket if it is NOT XTRA. (Holiday now fills. Regular now fills.)
+                        // Fills bucket if it is NOT XTRA. (Holiday now fills. Regular now fills.)
                         let fills = !isXTRA;
-                        let maxB = Math.ceil(tH * 4);
                         
+                        // NEW MATH ARCHITECTURE
+                        // 1. Process base scheduled hours (including Move Up)
+                        // 2. Process Early/Stay-Over hours separately
+                        
+                        let baseHrsToProcess = tH;
+                        let esHrsToProcess = esH;
+                        
+                        // --- Process Base Hours (Subject to Daily 12hr Tripwire) ---
+                        let maxB = Math.ceil(baseHrsToProcess * 4);
                         for (let b = 1; b <= maxB; b++) {
                             let chunk = 0.25;
-                            if (b * 0.25 > tH) { chunk = tH - ((b-1) * 0.25); } 
+                            if (b * 0.25 > baseHrsToProcess) { chunk = baseHrsToProcess - ((b-1) * 0.25); } 
                             let h = b / 4; 
-                            let curR = (h > (tH - stH) && stR > 0) ? stR : eR; 
+                            
+                            // Determine rate: if within Move Up hours, use stR, else eR
+                            let curR = (h > (baseHrsToProcess - stH) && stR > 0) ? stR : eR; 
                             let regPart = 0, otPart = 0;
+                            
+                            // Daily Tripwire (Hour 13+) -> Straight to OT
+                            if (h > 12 && !isHoliday && !isXTRA) {
+                                otPart = chunk; wk.oC += (curR * 1.5 * otPart); wk.oH += otPart; wk.incC += (curR * 1.5 * otPart);
+                                continue;
+                            }
                             
                             if (isHoliday) {
                                 otPart = chunk; wk.hC += (curR * 2.5 * otPart); wk.hH += otPart; wk.incC += (curR * 2.5 * otPart);
@@ -1037,6 +1083,32 @@
                                         if(fills) buck = buck + regPart; 
                                     } else {
                                         otPart = chunk; wk.oC += (curR * 1.5 * otPart); wk.oH += otPart; wk.incC += (curR * 1.5 * otPart);
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- Process Early/Stay-Over Hours ---
+                        if (esHrsToProcess > 0) {
+                            let maxES = Math.ceil(esHrsToProcess * 4);
+                            for (let b = 1; b <= maxES; b++) {
+                                let chunk = 0.25;
+                                if (b * 0.25 > esHrsToProcess) { chunk = esHrsToProcess - ((b-1) * 0.25); }
+                                
+                                let otPart = 0;
+                                // If it is Sunday (d===0), these hours fill the bucket but pay premium.
+                                // Otherwise, bypass bucket entirely.
+                                
+                                if (isHoliday) {
+                                    otPart = chunk; wk.hC += (esR * 2.5 * otPart); wk.hH += otPart; wk.incC += (esR * 2.5 * otPart);
+                                    if(d===0 && fills) buck = buck + chunk;
+                                } else {
+                                    if(d===0) {
+                                        otPart = chunk; wk.sC += (esR * 1.5 * otPart); wk.sH += otPart; wk.incC += (esR * 1.5 * otPart);
+                                        if(fills) buck = buck + chunk; // Sunday exception
+                                    } else {
+                                        otPart = chunk; wk.oC += (esR * 1.5 * otPart); wk.oH += otPart; wk.incC += (esR * 1.5 * otPart);
+                                        // Does NOT fill bucket
                                     }
                                 }
                             }
@@ -1198,7 +1270,18 @@
 
     function toggleExtra(w, d) { let c=document.getElementById('extra-'+w+'-'+d), s=document.getElementById('extra-rate-'+w+'-'+d); if(c.checked) s.classList.add('show'); else { s.classList.remove('show'); s.value="0"; } calc(); }
     function toggleVW(w) { days.forEach((d,i)=>{ document.getElementById('btn-'+w+'-'+i).classList.remove('active'); document.getElementById('time-'+w+'-'+i).value=""; }); calc(); }
-    function toggleZone(w, d) { document.getElementById('zone-'+w+'-'+d).classList.toggle('show'); }
+    function toggleZone(type, w, d) { 
+        let muZone = document.getElementById(`zone-mu-${w}-${d}`);
+        let esZone = document.getElementById(`zone-es-${w}-${d}`);
+        
+        if (type === 'mu') {
+            muZone.classList.toggle('show');
+            if (muZone.classList.contains('show')) esZone.classList.remove('show');
+        } else {
+            esZone.classList.toggle('show');
+            if (esZone.classList.contains('show')) muZone.classList.remove('show');
+        }
+    }
     function toggleRates() { let el=document.getElementById('rate-content'); el.classList.toggle('show'); document.getElementById('rate-arrow').innerText=el.classList.contains('show')?'▼':'▶'; }
     function toggleCard(id) { document.getElementById(id).classList.toggle('show'); document.getElementById('arrow-'+id).innerText = document.getElementById(id).classList.contains('show') ? '▼' : '▶'; }
 
@@ -1414,7 +1497,22 @@
             for (const [key, val] of Object.entries(data.inputs)) { let el = document.getElementById(key); if(el && key !== 'audit-toggle') { if(el.type === 'checkbox') el.checked = val; else if(el.classList.contains('btn-12') && val===true) el.classList.add('active'); else el.value = val; } }
             if(data.inputs['sm-1']) document.getElementById('sm-1').setAttribute('data-rate', data.inputs['sm-rate-1'] || '1.5');
             if(data.inputs['sm-2']) document.getElementById('sm-2').setAttribute('data-rate', data.inputs['sm-rate-2'] || '1.5');
-            for(let w=1; w<=2; w++) { days.forEach((d,i) => { if(parseFloat(document.getElementById(`step-hrs-${w}-${i}`).value)>0 || parseFloat(document.getElementById(`step-rate-${w}-${i}`).value)>0 || document.getElementById(`mt-${w}-${i}`).checked) document.getElementById(`zone-${w}-${i}`).classList.add('show'); if(document.getElementById(`ro-${w}-${i}`).checked) document.getElementById(`card-${w}-${i}`).classList.add('ro-active'); }); }
+            for(let w=1; w<=2; w++) { days.forEach((d,i) => { 
+                let muHrs = parseFloat(document.getElementById(`step-hrs-${w}-${i}`).value)>0;
+                let muRate = parseFloat(document.getElementById(`step-rate-${w}-${i}`).value)>0;
+                let esHrs = parseFloat(document.getElementById(`es-hrs-${w}-${i}`).value)>0;
+                let esRate = parseFloat(document.getElementById(`es-rate-${w}-${i}`).value)>0;
+                let mtOn = document.getElementById(`mt-${w}-${i}`).checked;
+                
+                if (muHrs || muRate) {
+                    document.getElementById(`zone-mu-${w}-${i}`).classList.add('show');
+                }
+                if (esHrs || esRate || mtOn) {
+                    document.getElementById(`zone-es-${w}-${i}`).classList.add('show');
+                }
+                
+                if(document.getElementById(`ro-${w}-${i}`).checked) document.getElementById(`card-${w}-${i}`).classList.add('ro-active'); 
+            }); }
         }
     }
     function resetCheckData() { if(confirm("Are you sure? This will DELETE all saved checks for "+currentYear)) { localStorage.removeItem(`ledger_${currentYear}_final`); location.reload(); } }
