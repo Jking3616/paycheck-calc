@@ -614,19 +614,35 @@ function isUnionHoliday(dateStr){
             let val = isDone ? f(data.net) : "--";
             let statusClass = "";
             if (isVerified) statusClass = "verified"; else if (isDone) statusClass = "estimated"; else if (today >= p.start && today <= p.end) statusClass = "current";
+            
+            // SCAN THE 14 DAYS FOR VACATIONS AND HOLIDAYS
             let isVac = false;
+            let hasHol = false;
             let pS = new Date(p.start);
-            while(pS <= new Date(p.end)) { if(vacationDates.includes(fmt(pS))) isVac = true; pS.setDate(pS.getDate()+1); }
+            let pE = new Date(p.end);
+            while(pS <= pE) { 
+                let dStr = fmt(pS);
+                if(vacationDates.includes(dStr)) isVac = true; 
+                if(isUnionHoliday(dStr)) hasHol = true; // Checks if any day is a holiday
+                pS.setDate(pS.getDate()+1); 
+            }
             if(isVac) statusClass += " vacation-active";
+            
+            // APPLY PURPLE INLINE STYLE IF HOLIDAY IS FOUND
+            let rangeStyle = hasHol ? "color: #ba68c8; font-weight: bold;" : "";
+            
             let depBadge = "";
             if(isDone && distTotal > 0) {
                 let mainDep = Math.max(0, data.net - distTotal);
                 depBadge = `<div class="deposit-badge">Main Deposit: ${f(mainDep)}</div>`;
             }
-            container.innerHTML += `<div class="pay-card ${statusClass} ${p.isEarly?'early-pay':''}" onclick="openPeriod(${p.id})" data-ref-section="Dashboard" data-ref-selector=".pay-card"><div class="date-badge" onclick="resetSingleCheck(${p.id}, event)">#${p.id}</div><div class="card-info"><span class="pay-date-label">${p.payDate} Paycheck</span><span class="period-range">${p.fullRange}</span>${depBadge}</div><div class="card-total">${val}</div></div>`;
+            
+            // INJECTS rangeStyle INTO THE .period-range SPAN
+            container.innerHTML += `<div class="pay-card ${statusClass} ${p.isEarly?'early-pay':''}" onclick="openPeriod(${p.id})" data-ref-section="Dashboard" data-ref-selector=".pay-card"><div class="date-badge" onclick="resetSingleCheck(${p.id}, event)">#${p.id}</div><div class="card-info"><span class="pay-date-label">${p.payDate} Paycheck</span><span class="period-range" style="${rangeStyle}">${p.fullRange}</span>${depBadge}</div><div class="card-total">${val}</div></div>`;
         });
+        
         document.getElementById('header-ytd-label').innerText = "EST. GROSS YTD";
-       document.getElementById('header-ytd-gross').innerText = f(totalEstGrossVal);
+        document.getElementById('header-ytd-gross').innerText = f(totalEstGrossVal);
         autoScroll(); 
     }
 
