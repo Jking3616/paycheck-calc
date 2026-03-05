@@ -924,7 +924,6 @@ function isUnionHoliday(dateStr){
             let prevW2 = parseFloat(document.getElementById('prevW2').value) || 0;
             let vacHourly = Math.max(bidRate, (prevW2 * 0.02) / 40);
             
-            // PRE-CHECK: Auto-check VW if full week is booked in planner
             let pStart = periods[currentPeriodId-1].startDateObj;
             for(let w=1; w<=2; w++) {
                 let isFullWeekOrange = true;
@@ -966,7 +965,6 @@ function isUnionHoliday(dateStr){
                     let esH = document.getElementById(`es-hrs-${w}-${d}`).value;
                     let esR = document.getElementById(`es-rate-${w}-${d}`).value;
 
-                    // UI OVERHAUL: Green for Extra, Gold for MT Border
                     toggleBtnMU.classList.remove('glow-blue');
                     toggleBtnES.classList.remove('glow-green', 'glow-blue', 'glow-gold');
                     let mtLabel = mtCheck ? mtCheck.closest('.mt-label') : null;
@@ -1007,14 +1005,13 @@ function isUnionHoliday(dateStr){
                         document.getElementById('time-'+w+'-'+d).value = ""; 
                     }
                     
-                    dayMap.push({ w: w, d: d, date: new Date(dateStr), ro: ro, hasWork: hasWork, xtra: xtra, isScheduled: (hasWork || ro) && !xtra, timeHrs: timeHrs, dq: (dqCheck && dqCheck.checked), mt: hasMT });
+                    dayMap.push({ w: w, d: d, date: new Date(dateStr), ro: ro, hasWork: hasWork, xtra: xtra, isScheduled: (hasWork || ro) && !xtra, timeHrs: timeHrs, dq: (dqCheck && dqCheck.checked), mt: hasMT, isVac: isVac });
                 }
             }
             if (dayMap.length === 0) return;
 
             let GT = { rH:0, rC:0, vH:0, vC:0, oH:0, oC:0, cH:0, cC:0, sH:0, sC:0, hH:0, hC:0, uhH:0, uhC:0, incC:0, vbC:0, mtH:0, mtC:0 };
             
-            // THE "MAKE-WHOLE" HOLIDAY LOOP
             for (let i = 0; i < 14; i++) {
                 let dayObj = dayMap[i];
                 let card = document.getElementById(`card-${dayObj.w}-${dayObj.d}`);
@@ -1028,12 +1025,12 @@ function isUnionHoliday(dateStr){
                 if (isHoliday) { 
                     let disqualified = false;
                     if (dayObj.dq) disqualified = true;
-                    if (!disqualified) {
+                    if (!disqualified && !dayObj.isVac) {
                         for (let b = i - 1; b >= 0; b--) {
                             if (dayMap[b].isScheduled) { if (dayMap[b].ro) disqualified = true; break; }
                         }
                     }
-                    if (!disqualified) {
+                    if (!disqualified && !dayObj.isVac) {
                         for (let f = i + 1; f < 14; f++) {
                             if (dayMap[f].isScheduled) { if (dayMap[f].ro) disqualified = true; break; }
                         }
@@ -1041,15 +1038,15 @@ function isUnionHoliday(dateStr){
                     
                     if (!disqualified) {
                         let esH = parseFloat(document.getElementById(`es-hrs-${dayObj.w}-${dayObj.d}`).value) || 0;
-                        let totWorked = dayObj.timeHrs + esH; // 0 if on Vacation or Off
+                        let totWorked = dayObj.timeHrs + esH;
 
                         if (totWorked === 0) {
-                            card.classList.add('hol-unworked'); 
+                            if (!dayObj.isVac) card.classList.add('hol-unworked'); 
                             dayObj.uhHrs = 8;
                         } else {
                             card.classList.add('hol-worked');
                             if (totWorked < 8 && !dayObj.ro) {
-                                dayObj.uhHrs = 8 - totWorked; // The Make-Whole Sliding Scale
+                                dayObj.uhHrs = 8 - totWorked; 
                             }
                         }
                     } 
@@ -1065,7 +1062,6 @@ function isUnionHoliday(dateStr){
                 let bPct = (parseFloat(document.getElementById('bonus-'+w).value)||0) / 100;
                 let vacBonus = 0, buck = 0;
 
-                // Process Unworked Holiday Deficits & Meal Tickets FIRST
                 for(let i=(w-1)*7; i<(w*7); i++) { 
                     let dObj = dayMap[i];
                     if(dObj.uhHrs > 0) { wk.uhH += dObj.uhHrs; wk.uhC += (bidRate * dObj.uhHrs); }
@@ -1080,14 +1076,13 @@ function isUnionHoliday(dateStr){
                 else {
                     for (let d = 0; d < 7; d++) {
                         if (document.getElementById(`ro-${w}-${d}`).checked) continue;
-                        let isVD = document.getElementById(`vd-${w}-${d}`).checked; 
-                        let dayDate = dayMap[(w-1)*7 + d].date;
-                        let isVacArr = vacationDates.includes(dayDate.toISOString().split('T')[0]);
-                        if(isVD || isVacArr) { wk.vC += (vacHourly * 8); wk.vH += 8; continue; }
-
                         let dayIdx = (w-1)*7 + d;
-                        let tH = dayMap[dayIdx].timeHrs;
-                        let hasWork = dayMap[dayIdx].hasWork;
+                        let dObj = dayMap[dayIdx];
+                        
+                        if(dObj.isVac) { wk.vC += (vacHourly * 8); wk.vH += 8; continue; }
+
+                        let tH = dObj.timeHrs;
+                        let hasWork = dObj.hasWork;
                         if(!hasWork) continue; 
 
                         let exV = document.getElementById(`extra-rate-${w}-${d}`).value;
@@ -1104,7 +1099,7 @@ function isUnionHoliday(dateStr){
                         let isXTRA = document.getElementById(`extra-${w}-${d}`)?.checked;
                         if(document.getElementById(`call-${w}-${d}`).checked) { wk.cC += (eR * 2); wk.cH += 2; }
                         let holCheck = document.getElementById(`hol-${w}-${d}`);
-                        let isHoliday = (holCheck && holCheck.checked) || isUnionHoliday(dayDate.toISOString().split('T')[0]); 
+                        let isHoliday = (holCheck && holCheck.checked) || isUnionHoliday(dObj.date.toISOString().split('T')[0]); 
                         
                         let fills = !isXTRA;
                         let baseHrsToProcess = tH;
@@ -1159,7 +1154,7 @@ function isUnionHoliday(dateStr){
                                 if (b * 0.25 > esHrsToProcess) { chunk = esHrsToProcess - ((b-1) * 0.25); }
                                 let otPart = 0;
                                 if (isHoliday) {
-                                    otPart = chunk; wk.hC += (esR * 2.5 * otPart); wk.hH += otPart; wk.incC += (esR * 2.5 * otPart);
+                                    otPart = chunk; wk.hC += (esR * 2.5 * otPart); wk.hH += otPart; wk.incC += (esR * 2.5 * otPart); // FIXED INCENTIVE BUG
                                     if(d===0 && fills) buck = buck + chunk;
                                 } else {
                                     if(d===0) {
