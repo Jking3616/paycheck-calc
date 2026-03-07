@@ -979,7 +979,9 @@ function isUnionHoliday(dateStr){
 
                     let hasWork = false;
                     if (!isVac && !ro) {
-                        if (timeHrs > 0) { hasWork = true; }
+                        let parsedES = parseFloat(esH) || 0;
+                        let parsedStep = parseFloat(stepH) || 0;
+                        if (timeHrs > 0 || parsedES > 0 || parsedStep > 0) { hasWork = true; }
                         else if (btn.classList.contains('active')) { 
                             hasWork = true; 
                             timeHrs = parseFloat(btn.innerText.split(' ')[0]) || 12; 
@@ -1219,7 +1221,7 @@ function isUnionHoliday(dateStr){
             let cR = (parseFloat(document.getElementById('cityTaxRate').value)||0)/100;
             
             let est = { 
-                k: r2(totalGross*kR), fed: r2((totalGross - r2(totalGross*kR))*fR_t), state: r2((totalGross - r2(totalGross*kR))*sR), city: r2(totalGross*cR), fica: r2(totalGross*0.062), med: r2(totalGross*0.0145), dues: r2(dEst), duesHr: r2(totalWorkHrs*dHrR), life: parseFloat(document.getElementById('lifeEE').value)||0, addOpt: parseFloat(document.getElementById('addOpt').value)||0, charity: parseFloat(document.getElementById('charity').value)||0, l1: parseFloat(document.getElementById('loan1').value)||0, l2: parseFloat(document.getElementById('loan2').value)||0, garn: parseFloat(document.getElementById('garnishment').value)||0 
+                k: r2((totalGross - GT.mtC) * kR), fed: r2((totalGross - r2((totalGross - GT.mtC) * kR))*fR_t), state: r2((totalGross - r2((totalGross - GT.mtC) * kR))*sR), city: r2(totalGross*cR), fica: r2(totalGross*0.062), med: r2(totalGross*0.0145), dues: r2(dEst), duesHr: r2(totalWorkHrs*dHrR), life: parseFloat(document.getElementById('lifeEE').value)||0, addOpt: parseFloat(document.getElementById('addOpt').value)||0, charity: parseFloat(document.getElementById('charity').value)||0, l1: parseFloat(document.getElementById('loan1').value)||0, l2: parseFloat(document.getElementById('loan2').value)||0, garn: parseFloat(document.getElementById('garnishment').value)||0 
             };
             
             let act = auditData[currentPeriodId] || {}, finalD = 0, taxG = totalGross - est.k; 
